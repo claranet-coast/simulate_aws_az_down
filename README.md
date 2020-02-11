@@ -29,6 +29,8 @@ optional arguments:
 It force a failover of all RDS and it stops all EC2 instances in that (vpc, AZ).
 
 ```
+AWS_REGION=eu-west-1
+AWS_PROFILE=myawsprofile
 python3 aws-ha-test.py --destroy --vpcid vpc-c9ee2dad --azid eu-west-1a
 ```
 
@@ -38,5 +40,7 @@ python3 aws-ha-test.py --destroy --vpcid vpc-c9ee2dad --azid eu-west-1a
 Basically it restarts all instances that had been previously stopped by this script.
 
 ```
+AWS_REGION=eu-west-1
+AWS_PROFILE=myawsprofile
 python3 aws-ha-test.py --restore --vpcid vpc-c9ee2dad --azid eu-west-1a
 ```
