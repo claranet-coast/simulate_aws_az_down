@@ -146,7 +146,8 @@ if __name__ == "__main__":
         else:
             for rds_id in RDS.split(","):
                 print(f"Triggering a Failover of the rds {rds_id}")
-                failover_rds(rds_id)
+                if not DRY:
+                    failover_rds(rds_id)
         # stop all instances in the given vpc/AZ
         for instance in ec2_list:
             instance_id = instance['InstanceId']
