@@ -95,11 +95,18 @@ def remove_stopped_tag(instance_id, tagkey):
 def get_args():
     parser = argparse.ArgumentParser(description='Simulate an AWS AZ fail')
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-r', '--restore', help="Restart the instances stopped by this script", action="store_true")
-    group.add_argument('-d', '--destroy', help="Force a fail of an Availability Zone (Default)", action="store_true")
-    parser.add_argument('-n', '--vpcid', type=str, required=True, help="VPC ID")
-    parser.add_argument('-a', '--azid', type=str, required=True, help="Availability Zone ID")
-    parser.add_argument('--dry', help="Dry run", action="store_true")
+    group.add_argument('-r', '--restore', action="store_true",
+        help="Restart the instances stopped by this script")
+    group.add_argument('-d', '--destroy', action="store_true",
+        help="Force a fail of an Availability Zone (Default)")
+    parser.add_argument('-n', '--vpcid', type=str, required=True,
+        help="VPC ID")
+    parser.add_argument('-a', '--azid', type=str, required=True,
+        help="Availability Zone ID")
+    parser.add_argument('-b', '--rdsid', type=str,
+        help="Comma separated list of RDS IDs. Use this argument if you want \
+        to limit the failover to specific RDS")
+    parser.add_argument('--dry', action="store_true", help="Dry run")
     args = parser.parse_args()
     return args
 
@@ -109,6 +116,7 @@ if __name__ == "__main__":
 
     AZ = args.azid
     VPC = args.vpcid
+    RDS = args.rdsid
     STOPPED_TAG = "stoppedByHAtest"
     DRY = args.dry
 
@@ -127,12 +135,17 @@ if __name__ == "__main__":
     else:
         print (f"Simulating the down of the AZ {AZ}")
         ec2_list = get_ec2_list(VPC, AZ, ['running', 'pending'])
-        rds_list = get_rds_list(VPC, AZ)
-        # Force failover of all rds in the given vpc/AZ
-        for rds in rds_list:
-            rds_id = rds['DBInstanceIdentifier']
-            print(f"Triggering a Failover of the rds {rds_id}")
-            if not DRY:
+        if not RDS:
+            rds_list = get_rds_list(VPC, AZ)
+            # Force failover of all rds in the given vpc/AZ
+            for rds in rds_list:
+                rds_id = rds['DBInstanceIdentifier']
+                print(f"Triggering a Failover of the rds {rds_id}")
+                if not DRY:
+                    failover_rds(rds_id)
+        else:
+            for rds_id in RDS.split(","):
+                print(f"Triggering a Failover of the rds {rds_id}")
                 failover_rds(rds_id)
         # stop all instances in the given vpc/AZ
         for instance in ec2_list:
