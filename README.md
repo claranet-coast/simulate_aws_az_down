@@ -8,7 +8,7 @@ boto3
 ## Help
 
 ```
-usage: aws-ha-test.py [-h] [-r | -d] -n VPCID -a AZID [--dry]
+usage: aws-ha-test.py [-h] [-r | -d] -n VPCID -a AZID [-b RDSID] [--dry]
 
 Simulate an AWS AZ fail
 
@@ -19,6 +19,9 @@ optional arguments:
   -n VPCID, --vpcid VPCID
                         VPC ID
   -a AZID, --azid AZID  Availability Zone ID
+  -b RDSID, --rdsid RDSID
+                        Comma separated list of RDS IDs. Use this argument if
+                        you want to limit the failover to specific RDS
   --dry                 Dry run
 ```
 
